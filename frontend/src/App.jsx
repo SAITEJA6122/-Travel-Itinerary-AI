@@ -1,0 +1,42 @@
+import { useContext } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import Login from './components/Login'
+import Register from './components/Register'
+import Dashboard from './components/Dashboard'
+import ItineraryView from './components/ItineraryView'
+import SharedItinerary from './components/SharedItinerary'
+import AuthContext from './context/AuthContext'
+import './App.css'
+
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useContext(AuthContext)
+  if (loading) return <div>Loading...</div>
+  return user ? children : <Navigate to='/login' />
+}
+
+function App() {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path='/' element={<Navigate to='/dashboard' />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} />
+        <Route path='/dashboard' element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path='/itinerary/:id' element={
+          <ProtectedRoute>
+            <ItineraryView />
+          </ProtectedRoute>
+        } />
+        <Route path='/shared/:shareId' element={<SharedItinerary />} />
+      </Routes>
+    </Router>
+  )
+}
+
+export default App
