@@ -16,7 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await axios.get('https://travel-itinerary-ai-1l2j.onrender.com/api/bookings');
+        const res = await axios.get('https://travel-itinerary-ai-1l2j.onrender.com/api/upload');
         setBookings(res.data);
       } catch (err) {
         console.error('Error fetching bookings:', err);
@@ -52,7 +52,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      await axios.delete(`https://travel-itinerary-ai-1l2j.onrender.com/api/bookings/${id}`);
+      await axios.delete(`https://travel-itinerary-ai-1l2j.onrender.com/api/upload/${id}`);
       setBookings(prev => prev.filter(b => b._id !== id));
       setSelectedBookings(prev => prev.filter(b => b !== id));
     } catch (err) {
