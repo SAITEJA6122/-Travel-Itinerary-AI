@@ -8,6 +8,15 @@ export default defineConfig({
     minify: 'esbuild',
     target: 'es2015',
     cssMinify: true,
-    chunkSizeWarningLimit: 500
+    chunkSizeWarningLimit: 500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          utils: ['axios', 'react-dropzone']
+        }
+      }
+    }
   }
 })
