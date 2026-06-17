@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useToast } from '../context/ToastContext';
 
 const ItineraryView = () => {
   const { id } = useParams();
   const [itinerary, setItinerary] = useState(null);
+  const showToast = useToast();
 
   useEffect(() => {
     const fetchItinerary = async () => {
@@ -13,10 +15,11 @@ const ItineraryView = () => {
         setItinerary(res.data);
       } catch (err) {
         console.error('Error fetching itinerary:', err);
+        showToast('Failed to load itinerary', 'error');
       }
     };
     fetchItinerary();
-  }, [id]);
+  }, [id, showToast]);
 
   if (!itinerary) return <div className="loading">Loading itinerary... ⏳</div>;
 
@@ -24,7 +27,7 @@ const ItineraryView = () => {
 
   const copyShareLink = () => {
     navigator.clipboard.writeText(shareUrl);
-    alert('Share link copied to clipboard! 📋');
+    showToast('Share link copied! 📋', 'success');
   };
 
   const exportAsText = () => {
@@ -50,6 +53,7 @@ const ItineraryView = () => {
     a.download = `${itinerary.title.replace(/\s+/g, '_')}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+    showToast('Exported as TXT!', 'success');
   };
 
   const exportAsJSON = () => {
@@ -60,6 +64,7 @@ const ItineraryView = () => {
     a.download = `${itinerary.title.replace(/\s+/g, '_')}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    showToast('Exported as JSON!', 'success');
   };
 
   return (

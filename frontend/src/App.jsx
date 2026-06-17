@@ -7,6 +7,7 @@ const Dashboard = lazy(() => import('./components/Dashboard'))
 const ItineraryView = lazy(() => import('./components/ItineraryView'))
 const SharedItinerary = lazy(() => import('./components/SharedItinerary'))
 import AuthContext from './context/AuthContext'
+import { ToastProvider } from './context/ToastContext'
 import './App.css'
 
 const ProtectedRoute = ({ children }) => {
@@ -17,27 +18,29 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   return (
-    <Router>
-      <Navbar />
-      <Suspense fallback={<div className="loading">Loading...</div>}>
-        <Routes>
-          <Route path='/' element={<Navigate to='/dashboard' />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/register' element={<Register />} />
-          <Route path='/dashboard' element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path='/itinerary/:id' element={
-            <ProtectedRoute>
-              <ItineraryView />
-            </ProtectedRoute>
-          } />
-          <Route path='/shared/:shareId' element={<SharedItinerary />} />
-        </Routes>
-      </Suspense>
-    </Router>
+    <ToastProvider>
+      <Router>
+        <Navbar />
+        <Suspense fallback={<div className="loading">Loading...</div>}>
+          <Routes>
+            <Route path='/' element={<Navigate to='/dashboard' />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
+            <Route path='/dashboard' element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path='/itinerary/:id' element={
+              <ProtectedRoute>
+                <ItineraryView />
+              </ProtectedRoute>
+            } />
+            <Route path='/shared/:shareId' element={<SharedItinerary />} />
+          </Routes>
+        </Suspense>
+      </Router>
+    </ToastProvider>
   )
 }
 

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import ItineraryList from './ItineraryList';
+import ConfirmModal from './ConfirmModal';
+import { useToast } from '../context/ToastContext';
 
 const Dashboard = () => {
   const [bookings, setBookings] = useState([]);
@@ -11,6 +13,9 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [uploading, setUploading] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, id: null });
+  const [loading, setLoading] = useState(true);
+  const showToast = useToast();
 
   // Fetch bookings on load
   useEffect(() => {
@@ -20,10 +25,13 @@ const Dashboard = () => {
         setBookings(res.data);
       } catch (err) {
         console.error('Error fetching bookings:', err);
+        showToast('Failed to load bookings', 'error');
+      } finally {
+        setLoading(false);
       }
     };
     fetchBookings();
-  }, []);
+  }, [showToast]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -32,6 +40,7 @@ const Dashboard = () => {
     },
     onDrop: async (acceptedFiles) => {
       setUploading(true);
+      showToast(`Uploading ${acceptedFiles.length} file(s)...`, 'info');
       try {
         for (const file of acceptedFiles) {
           const formData = new FormData();
@@ -39,8 +48,10 @@ const Dashboard = () => {
           const res = await axios.post('https://travel-itinerary-ai-1l2j.onrender.com/api/upload', formData);
           setBookings(prev => [...prev, res.data]);
         }
+        showToast('File(s) uploaded successfully!', 'success');
       } catch (err) {
         console.error('Error uploading:', err);
+        showToast('Failed to upload file(s)', 'error');
       } finally {
         setUploading(false);
       }
@@ -48,29 +59,40 @@ const Dashboard = () => {
   });
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this booking?')) {
-      return;
-    }
+    setDeleteConfirm({ isOpen: true, id });
+  };
+
+  const confirmDelete = async () => {
     try {
-      await axios.delete(`https://travel-itinerary-ai-1l2j.onrender.com/api/upload/${id}`);
-      setBookings(prev => prev.filter(b => b._id !== id));
-      setSelectedBookings(prev => prev.filter(b => b !== id));
+      await axios.delete(`https://travel-itinerary-ai-1l2j.onrender.com/api/upload/${deleteConfirm.id}`);
+      setBookings(prev => prev.filter(b => b._id !== deleteConfirm.id));
+      setSelectedBookings(prev => prev.filter(b => b !== deleteConfirm.id));
+      showToast('Booking deleted!', 'success');
     } catch (err) {
       console.error('Error deleting booking:', err);
+      showToast('Failed to delete booking', 'error');
+    } finally {
+      setDeleteConfirm({ isOpen: false, id: null });
     }
   };
 
   const handleGenerate = async () => {
-    if (selectedBookings.length === 0) return;
+    if (selectedBookings.length === 0) {
+      showToast('Please select at least one booking', 'info');
+      return;
+    }
     setGenerating(true);
+    showToast('Generating your itinerary...', 'info');
     try {
       const res = await axios.post('https://travel-itinerary-ai-1l2j.onrender.com/api/itineraries/generate', {
         bookingIds: selectedBookings,
         title
       });
+      showToast('Itinerary created!', 'success');
       window.location.href = `/itinerary/${res.data._id}`;
     } catch (err) {
       console.error('Error generating itinerary:', err);
+      showToast('Failed to generate itinerary', 'error');
     } finally {
       setGenerating(false);
     }
@@ -230,6 +252,14 @@ const Dashboard = () => {
           <ItineraryList />
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={deleteConfirm.isOpen}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteConfirm({ isOpen: false, id: null })}
+        title="Delete Booking?"
+        message="Are you sure you want to delete this booking? This action cannot be undone."
+      />
     </div>
   );
 };

@@ -1,22 +1,28 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
+  const showToast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await register(name, email, password);
+      showToast('Account created! Welcome! 🎉', 'success');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      showToast(err.response?.data?.message || 'Registration failed', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -24,7 +30,6 @@ const Register = () => {
     <div className="auth-container">
       <div className="auth-card">
         <h2>Create Account 🎉</h2>
-        {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label>Name</label>
@@ -56,7 +61,9 @@ const Register = () => {
               placeholder="••••••••"
             />
           </div>
-          <button type="submit" className="btn-primary">Register</button>
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? 'Creating account...' : 'Register'}
+          </button>
         </form>
       </div>
     </div>
