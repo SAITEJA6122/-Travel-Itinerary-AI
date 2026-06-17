@@ -10,7 +10,7 @@ const SharedItinerary = () => {
   useEffect(() => {
     const fetchItinerary = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/itineraries/shared/${shareId}`);
+        const res = await axios.get(`https://travel-itinerary-ai-1l2j.onrender.com/api/itineraries/shared/${shareId}`);
         setItinerary(res.data);
       } catch (err) {
         setError('Itinerary not found');

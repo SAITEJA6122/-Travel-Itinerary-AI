@@ -16,7 +16,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/bookings');
+        const res = await axios.get('https://travel-itinerary-ai-1l2j.onrender.com/api/bookings');
         setBookings(res.data);
       } catch (err) {
         console.error('Error fetching bookings:', err);
@@ -36,7 +36,7 @@ const Dashboard = () => {
         for (const file of acceptedFiles) {
           const formData = new FormData();
           formData.append('document', file);
-          const res = await axios.post('http://localhost:5000/api/upload', formData);
+          const res = await axios.post('https://travel-itinerary-ai-1l2j.onrender.com/api/upload', formData);
           setBookings(prev => [...prev, res.data]);
         }
       } catch (err) {
@@ -52,7 +52,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      await axios.delete(`http://localhost:5000/api/bookings/${id}`);
+      await axios.delete(`https://travel-itinerary-ai-1l2j.onrender.com/api/bookings/${id}`);
       setBookings(prev => prev.filter(b => b._id !== id));
       setSelectedBookings(prev => prev.filter(b => b !== id));
     } catch (err) {
@@ -64,7 +64,7 @@ const Dashboard = () => {
     if (selectedBookings.length === 0) return;
     setGenerating(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/itineraries/generate', {
+      const res = await axios.post('https://travel-itinerary-ai-1l2j.onrender.com/api/itineraries/generate', {
         bookingIds: selectedBookings,
         title
       });

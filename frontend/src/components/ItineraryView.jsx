@@ -9,7 +9,7 @@ const ItineraryView = () => {
   useEffect(() => {
     const fetchItinerary = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/itineraries/${id}`);
+        const res = await axios.get(`https://travel-itinerary-ai-1l2j.onrender.com/api/itineraries/${id}`);
         setItinerary(res.data);
       } catch (err) {
         console.error('Error fetching itinerary:', err);

@@ -8,7 +8,7 @@ const ItineraryList = () => {
   useEffect(() => {
     const fetchItineraries = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/itineraries');
+        const res = await axios.get('https://travel-itinerary-ai-1l2j.onrender.com/api/itineraries');
         setItineraries(res.data);
       } catch (err) {
         console.error('Error fetching itineraries:', err);
